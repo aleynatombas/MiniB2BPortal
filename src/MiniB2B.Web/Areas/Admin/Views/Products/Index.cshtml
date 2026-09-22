@@ -1,0 +1,78 @@
+@model IReadOnlyList<ProductDto>
+@{
+    ViewData["Title"] = "Ürünler";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="h3 mb-0">Ürünler</h1>
+    <a class="btn btn-primary" asp-action="Create">Yeni ürün</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col">
+        <input class="form-control" name="q" value="@ViewBag.Query" placeholder="Kod, ad, marka, üretici kodu, açıklama, özel kod..." />
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-secondary" type="submit">Ara</button>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(ViewBag.Query as string))
+    {
+        <div class="col-auto">
+            <a class="btn btn-link" asp-action="Index">Temizle</a>
+        </div>
+    }
+</form>
+
+<div class="table-responsive bg-white border">
+    <table class="table table-hover align-middle mb-0">
+        <thead>
+            <tr>
+                <th class="d-none d-sm-table-cell"></th>
+                <th>Kod</th>
+                <th>Ad</th>
+                <th class="d-none d-md-table-cell">Marka</th>
+                <th class="d-none d-lg-table-cell">Üretici kodu</th>
+                <th>Stok</th>
+                <th class="text-end">Fiyat</th>
+                <th class="d-none d-md-table-cell">Durum</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        @if (Model.Count == 0)
+        {
+            <tr>
+                <td colspan="9" class="text-muted p-4">
+                    @(string.IsNullOrWhiteSpace(ViewBag.Query as string)
+                        ? "Henüz ürün yok."
+                        : "Aramanıza uygun ürün bulunamadı.")
+                </td>
+            </tr>
+        }
+        else
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td class="d-none d-sm-table-cell" style="width:56px">
+                        @if (!string.IsNullOrWhiteSpace(item.ImagePath))
+                        {
+                            <img src="@item.ImagePath" alt="" width="40" height="40" class="thumb" />
+                        }
+                    </td>
+                    <td>@item.ProductCode</td>
+                    <td>@item.Name</td>
+                    <td class="d-none d-md-table-cell">@item.Brand</td>
+                    <td class="d-none d-lg-table-cell">@item.ManufacturerCode</td>
+                    <td>@item.StockQuantity</td>
+                    <td class="text-end">@item.Price.ToString("N2") ₺</td>
+                    <td class="d-none d-md-table-cell">@(item.IsActive ? "Aktif" : "Pasif")</td>
+                    <td class="text-end">
+                        <a asp-action="Edit" asp-route-id="@item.Id">Düzenle</a>
+                    </td>
+                </tr>
+            }
+        }
+        </tbody>
+    </table>
+</div>

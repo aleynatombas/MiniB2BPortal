@@ -1,0 +1,40 @@
+@model ProductDto
+@{
+    var inStock = Model.StockQuantity > 0;
+    var level = StockRules.Evaluate(Model.StockQuantity, Model.CriticalStockLevel);
+    var badge = level == StockLevel.Available ? "Var" : level == StockLevel.Critical ? "Kritik" : "Yok";
+    var badgeCss = level == StockLevel.Available ? "stock-ok" : level == StockLevel.Critical ? "stock-low" : "stock-out";
+}
+
+<article class="product-card">
+    @if (!string.IsNullOrWhiteSpace(Model.ImagePath))
+    {
+        <img src="@Model.ImagePath" alt="@Model.Name" />
+    }
+    else
+    {
+        <div class="card-ph">Görsel yok</div>
+    }
+    <div class="body">
+        <div class="d-flex justify-content-between align-items-start gap-2">
+            <span class="brand">@Model.Brand</span>
+            <span class="stock-badge @badgeCss">@badge</span>
+        </div>
+        <h3>@Model.Name</h3>
+        <div class="small text-muted">@Model.ProductCode</div>
+        <div class="price">@Model.Price.ToString("N2") ₺</div>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <form asp-controller="Products" asp-action="AddToCart" method="post" class="mt-2">
+                <input type="hidden" name="productId" value="@Model.Id" />
+                <input type="hidden" name="quantity" value="1" />
+                <input type="hidden" name="returnTo" value="home" />
+                <button class="btn btn-primary w-100" type="submit" @(inStock ? null : "disabled")>Sepete ekle</button>
+            </form>
+        }
+        else
+        {
+            <a class="btn btn-primary w-100 mt-2" asp-controller="Account" asp-action="Login" asp-route-returnUrl="/Products">Giriş yapıp sipariş ver</a>
+        }
+    </div>
+</article>

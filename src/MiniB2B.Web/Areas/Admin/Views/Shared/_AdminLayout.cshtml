@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - OtoBayi Yönetim</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="admin-body">
+    @{
+        var current = ViewContext.RouteData.Values["controller"]?.ToString();
+    }
+    <header>
+        <nav class="navbar navbar-dark admin-top">
+            <div class="container-fluid px-3 px-lg-4">
+                <a class="brand text-white" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                    <span class="brand-mark">OB</span>
+                    <span><strong>OtoBayi <span class="d-none d-sm-inline">Yönetim</span></strong></span>
+                </a>
+                <div class="d-flex align-items-center gap-2 gap-md-3 flex-wrap justify-content-end">
+                    <a class="btn btn-sm btn-primary" asp-area="" asp-controller="Home" asp-action="Index">
+                        <span class="d-none d-sm-inline">Mağazayı gör</span>
+                        <span class="d-sm-none">Mağaza</span>
+                    </a>
+                    <span class="navbar-text d-none d-md-inline">@User.GetFullName()</span>
+                    <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                        <button type="submit" class="btn btn-sm btn-outline-light">Çıkış</button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-12 col-lg-2 admin-side">
+                <nav class="nav admin-nav">
+                    <a class="nav-link @(current == "Dashboard" ? "active" : null)" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Özet</a>
+                    <a class="nav-link @(current == "Products" ? "active" : null)" asp-area="Admin" asp-controller="Products" asp-action="Index">Ürünler</a>
+                    <a class="nav-link @(current == "Users" ? "active" : null)" asp-area="Admin" asp-controller="Users" asp-action="Index">Kullanıcılar</a>
+                    <a class="nav-link @(current == "Orders" ? "active" : null)" asp-area="Admin" asp-controller="Orders" asp-action="Index">Siparişler</a>
+                    <a class="nav-link @(current == "Sliders" ? "active" : null)" asp-area="Admin" asp-controller="Sliders" asp-action="Index">Slider</a>
+                    <a class="nav-link @(current == "GridColumns" ? "active" : null)" asp-area="Admin" asp-controller="GridColumns" asp-action="Index">Grid kolonları</a>
+                </nav>
+            </aside>
+            <main class="col-12 col-lg-10 admin-main">
+                @if (TempData["Success"] is string success)
+                {
+                    <div class="alert alert-success">@success</div>
+                }
+                @if (TempData["Error"] is string error)
+                {
+                    <div class="alert alert-danger">@error</div>
+                }
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

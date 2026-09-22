@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MiniB2B.Business/MiniB2B.Business.csproj" />
+    <Project Path="src/MiniB2B.DataAccess/MiniB2B.DataAccess.csproj" />
+    <Project Path="src/MiniB2B.Domain/MiniB2B.Domain.csproj" />
+    <Project Path="src/MiniB2B.Web/MiniB2B.Web.csproj" />
+  </Folder>
+</Solution>

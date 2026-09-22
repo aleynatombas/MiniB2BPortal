@@ -1,0 +1,44 @@
+@model IReadOnlyList<UserDto>
+@{
+    ViewData["Title"] = "Kullanıcılar";
+}
+
+<h1 class="h3 mb-3">Kullanıcılar</h1>
+<form method="get" class="row g-2 mb-3">
+    <div class="col">
+        <input class="form-control" name="q" value="@ViewBag.Query" placeholder="Ad, soyad, e-posta, kullanıcı adı..." />
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-secondary" type="submit">Ara</button>
+    </div>
+</form>
+
+<div class="table-responsive bg-white border">
+    <table class="table table-hover align-middle mb-0">
+        <thead>
+            <tr>
+                <th>Ad Soyad</th>
+                <th>Kullanıcı adı</th>
+                <th>E-posta</th>
+                <th>Telefon</th>
+                <th>Rol</th>
+                <th>Durum</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.FullName</td>
+                <td>@item.Username</td>
+                <td>@item.Email</td>
+                <td>@item.Phone</td>
+                <td>@(item.Role == UserRole.Admin ? "Yönetici" : "Bayi")</td>
+                <td>@(item.IsActive ? "Aktif" : "Pasif")</td>
+                <td class="text-end"><a asp-action="Edit" asp-route-id="@item.Id">Düzenle</a></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

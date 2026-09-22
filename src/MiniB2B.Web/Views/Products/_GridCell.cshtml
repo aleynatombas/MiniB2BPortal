@@ -1,0 +1,55 @@
+@model ProductGridCellModel
+@{
+    var column = Model.Column;
+    var product = Model.Product;
+    var inStock = product.StockQuantity > 0;
+}
+
+@switch (column.RenderType)
+{
+    case GridRenderType.Image:
+        <a href="#" data-product-detail="@product.Id" data-term="@Model.Term">
+            @if (!string.IsNullOrWhiteSpace(product.ImagePath))
+            {
+                <img src="@product.ImagePath" alt="@product.Name" width="48" height="48" class="thumb" />
+            }
+            else
+            {
+                <span class="text-muted small">Görsel yok</span>
+            }
+        </a>
+        break;
+
+    case GridRenderType.StockBadge:
+        {
+            var level = StockRules.Evaluate(product.StockQuantity, product.CriticalStockLevel);
+            var css = level == StockLevel.Available ? "stock-ok" : level == StockLevel.Critical ? "stock-low" : "stock-out";
+            var text = level == StockLevel.Available ? "Var" : level == StockLevel.Critical ? "Kritik" : "Yok";
+            <span class="stock-badge @css">@text</span>
+        }
+        break;
+
+    case GridRenderType.Currency:
+        {
+            var raw = ProductFieldAccessor.GetValue(product, column.FieldName);
+            var price = raw is decimal amount ? amount : product.Price;
+            <span>@price.ToString("N2") ₺</span>
+        }
+        break;
+
+    case GridRenderType.QuantityInput:
+        <input type="number" name="quantity" class="form-control form-control-sm qty-input" value="1" min="1" max="@Math.Max(product.StockQuantity, 1)" form="cart-@product.Id" @(inStock ? null : "disabled") />
+        break;
+
+    case GridRenderType.AddToCartButton:
+        <form id="cart-@product.Id" asp-action="AddToCart" method="post">
+            <input type="hidden" name="productId" value="@product.Id" />
+            <input type="hidden" name="term" value="@Model.Term" />
+            <button type="submit" class="btn btn-sm btn-primary" @(inStock ? null : "disabled")>Sepete ekle</button>
+        </form>
+        break;
+
+    default:
+        <a href="#" data-product-detail="@product.Id" data-term="@Model.Term">@ProductFieldAccessor.GetText(product, column.FieldName)</a>
+        break;
+}

@@ -1,0 +1,19 @@
+namespace MiniB2B.Domain.Entities;
+
+/// <summary>
+/// Sipariş anındaki ürün/fiyat bilgisi korunur; ürün fiyatı sonradan değişse bile bu satır etkilenmez.
+/// </summary>
+public class OrderItem
+{
+    public int Id { get; set; }
+    public int OrderId { get; set; }
+    public int ProductId { get; set; }
+    public string ProductCode { get; set; } = string.Empty;
+    public string ProductName { get; set; } = string.Empty;
+    public int Quantity { get; set; }
+    public decimal UnitPrice { get; set; }
+    public decimal TotalPrice { get; set; }
+
+    public Order Order { get; set; } = null!;
+    public Product Product { get; set; } = null!;
+}

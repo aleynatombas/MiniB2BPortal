@@ -1,0 +1,104 @@
+@model ProductCatalogViewModel
+@{
+    ViewData["Title"] = "Ürünler";
+}
+
+<div class="store-page">
+<div class="container">
+<div class="page-head mb-4">
+    <p class="hero-kicker mb-1">YEDEK PARÇA</p>
+    <h1 class="h3 mb-0">Katalog</h1>
+</div>
+
+@if (TempData["Status"] is string status)
+{
+    <div class="alert alert-success">@status</div>
+}
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col">
+        <input class="form-control" name="term" value="@Model.Term" placeholder="Parça, OEM kod, marka veya özel kod..." />
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-secondary" type="submit">Ara</button>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Model.Term))
+    {
+        <div class="col-auto">
+            <a class="btn btn-link" asp-action="Index">Temizle</a>
+        </div>
+    }
+</form>
+
+<div class="table-responsive bg-white border">
+    <table class="table table-hover align-middle mb-0 product-grid">
+        <thead>
+            <tr>
+                @foreach (var column in Model.Columns)
+                {
+                    <th class="@GridDisplay.AlignClass(column.Alignment) @GridDisplay.VisibilityClass(column)" style="@(column.Width is null ? null : $"width:{column.Width}")">
+                        @column.Header
+                    </th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+        @if (Model.Products.Count == 0)
+        {
+            <tr>
+                <td colspan="@Model.Columns.Count" class="text-muted p-4">Aramanıza uygun ürün bulunamadı.</td>
+            </tr>
+        }
+        else
+        {
+            foreach (var product in Model.Products)
+            {
+                <tr>
+                    @foreach (var column in Model.Columns)
+                    {
+                        <td class="@GridDisplay.AlignClass(column.Alignment) @GridDisplay.VisibilityClass(column)">
+                            <partial name="_GridCell" model="new ProductGridCellModel { Column = column, Product = product, Term = Model.Term }" />
+                        </td>
+                    }
+                </tr>
+            }
+        }
+        </tbody>
+    </table>
+</div>
+</div>
+</div>
+
+<div class="modal fade" id="productDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title h5 mb-0">Ürün detayı</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body" id="productDetailBody"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll("[data-product-detail]").forEach(function (el) {
+            el.addEventListener("click", async function (e) {
+                e.preventDefault();
+                const id = el.getAttribute("data-product-detail");
+                const term = el.getAttribute("data-term") || "";
+                const response = await fetch("/Products/Details/" + id + "?term=" + encodeURIComponent(term), {
+                    headers: { "X-Requested-With": "XMLHttpRequest" }
+                });
+                if (!response.ok) return;
+                document.getElementById("productDetailBody").innerHTML = await response.text();
+                bootstrap.Modal.getOrCreateInstance(document.getElementById("productDetailModal")).show();
+            });
+        });
+    </script>
+}

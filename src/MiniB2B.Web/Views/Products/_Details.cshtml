@@ -1,0 +1,56 @@
+@model ProductDto
+@{
+    var inStock = Model.StockQuantity > 0;
+    var level = StockRules.Evaluate(Model.StockQuantity, Model.CriticalStockLevel);
+    var badge = level switch
+    {
+        StockLevel.Available => ("stock-ok", "Var"),
+        StockLevel.Critical => ("stock-low", "Kritik"),
+        _ => ("stock-out", "Yok")
+    };
+}
+
+<div class="row g-3">
+    <div class="col-md-4">
+        @if (!string.IsNullOrWhiteSpace(Model.ImagePath))
+        {
+            <img src="@Model.ImagePath" alt="@Model.Name" class="thumb-lg w-100" />
+        }
+    </div>
+    <div class="col-md-8">
+        <p class="small text-muted mb-1">@Model.ProductCode · @Model.CategoryName</p>
+        <h3 class="h5">@Model.Name</h3>
+        @if (!string.IsNullOrWhiteSpace(Model.Brand))
+        {
+            <p class="mb-1"><strong>Marka:</strong> @Model.Brand</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.ManufacturerCode))
+        {
+            <p class="mb-1"><strong>Üretici kodu:</strong> @Model.ManufacturerCode</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.CustomCode1))
+        {
+            <p class="mb-1"><strong>Özel kod 1:</strong> @Model.CustomCode1</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.CustomCode2))
+        {
+            <p class="mb-1"><strong>Özel kod 2:</strong> @Model.CustomCode2</p>
+        }
+        <p class="mb-1">
+            <strong>Stok:</strong>
+            <span class="stock-badge @badge.Item1">@badge.Item2</span>
+            <span class="text-muted small">(@Model.StockQuantity)</span>
+        </p>
+        <p class="h5 mb-3">@Model.Price.ToString("N2") ₺</p>
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <p>@Model.Description</p>
+        }
+        <form asp-action="AddToCart" method="post" class="d-flex gap-2 align-items-center">
+            <input type="hidden" name="productId" value="@Model.Id" />
+            <input type="hidden" name="term" value="@ViewBag.Term" />
+            <input type="number" name="quantity" class="form-control" style="max-width:100px" value="1" min="1" max="@Math.Max(Model.StockQuantity, 1)" @(inStock ? null : "disabled") />
+            <button type="submit" class="btn btn-primary" @(inStock ? null : "disabled")>Sepete ekle</button>
+        </form>
+    </div>
+</div>

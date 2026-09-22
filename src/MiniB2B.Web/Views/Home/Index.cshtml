@@ -1,0 +1,149 @@
+﻿@model HomeViewModel
+@{
+    ViewData["Title"] = "Ana sayfa";
+}
+
+<section class="hero">
+    <div class="container">
+        @if (Model.Sliders.Count > 0)
+        {
+            <div id="homeSlider" class="carousel slide" data-bs-ride="carousel">
+                @if (Model.Sliders.Count > 1)
+                {
+                    <div class="carousel-indicators">
+                        @for (var i = 0; i < Model.Sliders.Count; i++)
+                        {
+                            <button type="button" data-bs-target="#homeSlider" data-bs-slide-to="@i" class="@(i == 0 ? "active" : null)" aria-current="@(i == 0 ? "true" : null)" aria-label="Slayt @(i + 1)"></button>
+                        }
+                    </div>
+                }
+                <div class="carousel-inner">
+                    @for (var i = 0; i < Model.Sliders.Count; i++)
+                    {
+                        var slide = Model.Sliders[i];
+                        <div class="carousel-item @(i == 0 ? "active" : null)">
+                            <div class="hero-slide">
+                                <div>
+                                    <p class="hero-kicker">@slide.Title</p>
+                                    <h1>@(string.IsNullOrWhiteSpace(slide.Subtitle) ? slide.Title : slide.Subtitle)</h1>
+                                    <div class="d-flex gap-2 flex-wrap">
+                                        <a class="btn btn-primary" href="@(string.IsNullOrWhiteSpace(slide.LinkUrl) ? "/Products" : slide.LinkUrl)">Alışverişe başla</a>
+                                        <a class="btn btn-ghost" asp-controller="Products" asp-action="Index">Katalogu incele</a>
+                                    </div>
+                                </div>
+                                <div class="hero-visual">
+                                    @if (!string.IsNullOrWhiteSpace(slide.ImagePath))
+                                    {
+                                        <img src="@slide.ImagePath" alt="@slide.Title" />
+                                    }
+                                    else
+                                    {
+                                        <div class="hero-fallback">OB</div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                @if (Model.Sliders.Count > 1)
+                {
+                    <button class="carousel-control-prev" type="button" data-bs-target="#homeSlider" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                        <span class="visually-hidden">Önceki</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#homeSlider" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                        <span class="visually-hidden">Sonraki</span>
+                    </button>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="hero-slide">
+                <div>
+                    <p class="hero-kicker">OtoBayi</p>
+                    <h1>Servis stoğu. OEM kodlu parça.</h1>
+                    <p>Fren, filtre, ateşleme ve aydınlatma parçalarını tek yerden sipariş edin.</p>
+                    <a class="btn btn-primary" asp-controller="Products" asp-action="Index">Alışverişe başla</a>
+                </div>
+                <div class="hero-visual"><div class="hero-fallback">OB</div></div>
+            </div>
+        }
+        <div class="trust-row">
+            <div class="trust-item">Stoktan teslim</div>
+            <div class="trust-item">OEM kod</div>
+            <div class="trust-item">Bayi fiyatı</div>
+            <div class="trust-item">24s sevkiyat</div>
+        </div>
+    </div>
+</section>
+
+@if (TempData["Status"] is string status)
+{
+    <div class="container pt-4"><div class="alert alert-success">@status</div></div>
+}
+@if (TempData["Error"] is string error)
+{
+    <div class="container pt-4"><div class="alert alert-danger">@error</div></div>
+}
+
+@if (Model.Categories.Count > 0)
+{
+    <section class="section">
+        <div class="container">
+            <div class="section-title">
+                <span>KATEGORİLER</span>
+                <h2>Kategoriye göre alışveriş</h2>
+            </div>
+            <div class="cat-grid">
+                @foreach (var category in Model.Categories)
+                {
+                    <a class="cat-card" asp-controller="Products" asp-action="Index" asp-route-term="@category.Name">
+                        <div class="cat-icon">@(category.Name.Length >= 2 ? category.Name[..2] : category.Name)</div>
+                        <strong>@category.Name</strong>
+                    </a>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+@if (Model.Featured.Count > 0)
+{
+    <section class="section section-muted">
+        <div class="container">
+            <div class="section-title">
+                <span>ÖNE ÇIKANLAR</span>
+                <h2>Servis stoğundan seçilenler</h2>
+            </div>
+            <div class="row g-4">
+                @foreach (var product in Model.Featured)
+                {
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <partial name="_ProductCard" model="product" />
+                    </div>
+                }
+            </div>
+            <div class="text-center mt-4">
+                <a class="btn btn-ghost" asp-controller="Products" asp-action="Index">Tüm ürünleri gör</a>
+            </div>
+        </div>
+    </section>
+}
+
+<div class="container py-5">
+    <div class="promo">
+        <div>
+            <h2>Servis stoğu kontrolü bizde</h2>
+            <p class="mb-0">Sepete ekle, sipariş oluştur; yetersiz parçada işlem oluşmaz.</p>
+        </div>
+        <a class="btn btn-primary" asp-controller="Products" asp-action="Index">Kataloga git</a>
+    </div>
+    <div class="stats mt-4">
+        <div class="stat"><strong>12+</strong>ürün çeşidi</div>
+        <div class="stat"><strong>4</strong>ana kategori</div>
+        <div class="stat"><strong>24s</strong>hazırlık</div>
+        <div class="stat"><strong>%100</strong>stok kontrolü</div>
+    </div>
+</div>

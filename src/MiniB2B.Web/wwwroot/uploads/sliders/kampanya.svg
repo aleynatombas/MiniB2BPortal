@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320">
+  <rect width="1200" height="320" fill="#1b1f24"/>
+  <rect x="0" y="240" width="1200" height="80" fill="#f0a202"/>
+  <text x="60" y="140" fill="#f4efe6" font-size="42" font-family="Segoe UI, sans-serif">Bahar Bakımı</text>
+  <text x="60" y="190" fill="#f4efe6" font-size="22" font-family="Segoe UI, sans-serif">Fren setlerinde %15 bayi iskontosu</text>
+</svg>

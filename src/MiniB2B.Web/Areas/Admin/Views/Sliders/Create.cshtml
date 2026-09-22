@@ -1,0 +1,15 @@
+@model SliderFormViewModel
+@{
+    ViewData["Title"] = "Yeni slider";
+}
+
+<h1 class="h3 mb-3">Yeni slider</h1>
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+    <partial name="_SliderForm" model="Model" />
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+    <a class="btn btn-outline-secondary" asp-action="Index">İptal</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

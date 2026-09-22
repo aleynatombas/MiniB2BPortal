@@ -1,0 +1,30 @@
+@{
+    ViewData["Title"] = "Yönetim";
+}
+
+<p class="hero-kicker mb-1">YÖNETİM PANELİ</p>
+<h1 class="h3 mb-2">Kontrol özeti</h1>
+<p class="text-muted mb-4">Parça stoğu, bayi ve sipariş süreçlerini buradan yönetin.</p>
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="small text-muted">Ürün</div>
+            <div class="h2 mb-2">@ViewBag.ProductCount</div>
+            <a asp-controller="Products" asp-action="Index">Ürünlere git</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="small text-muted">Kullanıcı</div>
+            <div class="h2 mb-2">@ViewBag.UserCount</div>
+            <a asp-controller="Users" asp-action="Index">Kullanıcılara git</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="small text-muted">Sipariş</div>
+            <div class="h2 mb-2">@ViewBag.OrderCount</div>
+            <a asp-controller="Orders" asp-action="Index">Siparişlere git</a>
+        </div>
+    </div>
+</div>

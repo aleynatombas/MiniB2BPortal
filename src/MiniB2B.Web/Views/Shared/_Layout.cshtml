@@ -1,0 +1,107 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - OtoBayi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="store">
+    <div class="topbar">
+        <div class="container d-flex flex-wrap justify-content-between gap-2">
+            <span>OEM kodlu yedek parça · İstanbul içi 24 saat</span>
+            <span class="topbar-extra">Servis desteği · Stoktan teslim · Güvenli sipariş</span>
+        </div>
+    </div>
+    <header class="store-header">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span class="brand-mark">OB</span>
+                    <span>
+                        <strong>OtoBayi</strong>
+                        <small>Yedek parça portalı</small>
+                    </span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Menüyü aç">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div id="mainNav" class="collapse navbar-collapse">
+                    <ul class="navbar-nav mx-lg-4">
+                        <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Ana sayfa</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Products" asp-action="Index">Ürünler</a></li>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Orders" asp-action="Index">Siparişlerim</a></li>
+                            @if (User.IsAdmin())
+                            {
+                                <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Yönetim</a></li>
+                            }
+                        }
+                    </ul>
+                    <form class="header-search ms-lg-auto" asp-area="" asp-controller="Products" asp-action="Index" method="get">
+                        <input class="form-control" name="term" placeholder="Parça, OEM kod veya marka ara..." value="@Context.Request.Query["term"]" />
+                        <button class="btn btn-primary" type="submit">Ara</button>
+                    </form>
+                    <div class="header-actions">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <a class="icon-link" asp-area="" asp-controller="Cart" asp-action="Index">Sepet</a>
+                            <span class="header-user">@User.GetFullName()</span>
+                            <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                                <button type="submit" class="btn btn-ghost">Çıkış</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a class="icon-link" asp-area="" asp-controller="Account" asp-action="Login">Giriş</a>
+                            <a class="btn btn-primary" asp-area="" asp-controller="Account" asp-action="Register">Kayıt ol</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main>
+        @RenderBody()
+    </main>
+    <footer class="store-footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="brand mb-3">
+                        <span class="brand-mark">OB</span>
+                        <span><strong>OtoBayi</strong></span>
+                    </div>
+                    <p>Servis ve bayilere özel stoktan teslim fren, filtre, ateşleme ve aydınlatma parçaları.</p>
+                </div>
+                <div class="col-md-2">
+                    <h3>Mağaza</h3>
+                    <a asp-controller="Home" asp-action="Index">Ana sayfa</a>
+                    <a asp-controller="Products" asp-action="Index">Ürünler</a>
+                    <a asp-controller="Cart" asp-action="Index">Sepet</a>
+                </div>
+                <div class="col-md-3">
+                    <h3>Hesap</h3>
+                    <a asp-controller="Account" asp-action="Login">Giriş</a>
+                    <a asp-controller="Account" asp-action="Register">Bayi kaydı</a>
+                    <a asp-controller="Orders" asp-action="Index">Siparişlerim</a>
+                </div>
+                <div class="col-md-3">
+                    <h3>Destek</h3>
+                    <p class="mb-1">0212 000 00 01</p>
+                    <p class="mb-0">destek@otobayi.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">© @DateTime.Now.Year OtoBayi</div>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

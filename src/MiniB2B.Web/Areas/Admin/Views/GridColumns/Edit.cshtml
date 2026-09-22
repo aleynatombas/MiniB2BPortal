@@ -1,0 +1,64 @@
+@model GridColumnFormViewModel
+@{
+    ViewData["Title"] = "Grid kolonu";
+}
+
+<h1 class="h3 mb-3">Grid kolonu</h1>
+<form asp-action="Edit" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    <input type="hidden" asp-for="Id" />
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="FieldName" class="form-label"></label>
+            <select asp-for="FieldName" asp-items="ViewBag.Fields" class="form-select"></select>
+            <span asp-validation-for="FieldName" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="Header" class="form-label"></label>
+            <input asp-for="Header" class="form-control" />
+            <span asp-validation-for="Header" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="RenderType" class="form-label"></label>
+            <select asp-for="RenderType" asp-items="ViewBag.RenderTypes" class="form-select"></select>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Alignment" class="form-label"></label>
+            <select asp-for="Alignment" asp-items="ViewBag.Alignments" class="form-select"></select>
+        </div>
+        <div class="col-md-2 mb-3">
+            <label asp-for="SortOrder" class="form-label"></label>
+            <input asp-for="SortOrder" class="form-control" />
+        </div>
+        <div class="col-md-2 mb-3">
+            <label asp-for="Width" class="form-label"></label>
+            <input asp-for="Width" class="form-control" placeholder="120px" />
+        </div>
+    </div>
+    <div class="form-check mb-2">
+        <input asp-for="IsVisible" class="form-check-input" />
+        <label asp-for="IsVisible" class="form-check-label"></label>
+    </div>
+    <div class="form-check mb-2">
+        <input asp-for="ShowOnDesktop" class="form-check-input" />
+        <label asp-for="ShowOnDesktop" class="form-check-label"></label>
+    </div>
+    <div class="form-check mb-2">
+        <input asp-for="ShowOnTablet" class="form-check-input" />
+        <label asp-for="ShowOnTablet" class="form-check-label"></label>
+    </div>
+    <div class="form-check mb-3">
+        <input asp-for="ShowOnMobile" class="form-check-input" />
+        <label asp-for="ShowOnMobile" class="form-check-label"></label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Güncelle</button>
+    <a class="btn btn-outline-secondary" asp-action="Index">İptal</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

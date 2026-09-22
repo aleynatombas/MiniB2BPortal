@@ -1,0 +1,27 @@
+## .NET
+bin/
+obj/
+out/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+*.nupkg
+project.lock.json
+artifacts/
+
+## IDE
+.idea/
+*.rsuser
+*.ssdk
+.vscode/
+
+## OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+## Secrets / local
+appsettings.*.local.json
+*.pfx
