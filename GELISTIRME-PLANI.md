@@ -235,10 +235,4 @@ Liste: sipariş no, kullanıcı, tarih, tutar, durum. Detay: kod, ad, adet, biri
 4. Kullanılan teknolojiler
 5. Mimari / teknik tercihlerin kısa açıklaması
 
-Bu plan dosyası mimari ve faz kararlarını belgeler; README son fazda pratik çalıştırma bilgilerini içerir.
-
----
-
-## 9. Sıradaki adım
-
-**Faz 0 + Faz 1:** yarım kodu temizle, N-Tier iskeleti kur, veritabanını ve seed’i oluştur. Ekran yazılmaz. Bitince durulur.
+Bu plan dosyası mimari ve faz kararlarını belgeler; README pratik çalıştırma bilgilerini içerir.

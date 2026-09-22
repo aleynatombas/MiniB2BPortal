@@ -2,7 +2,7 @@
 
 Küçük ölçekli B2B e-ticaret uygulaması. Vitrin konsepti **oto yedek parça bayi portalı**: servisler fren, filtre, ateşleme ve aydınlatma parçası arar, sepete ekler ve sipariş verir; yöneticiler katalog, kullanıcı, sipariş durumu, ana sayfa slider’ı ve ürün grid kolonlarını yönetir.
 
-Ürün görselleri şimdilik yer tutucu; gerçek fotoğraflar sonra `wwwroot/uploads/products` ve `wwwroot/uploads/sliders` altına konur.
+Ürün ve slider görselleri `wwwroot/uploads` altındadır.
 
 ## Teknolojiler
 
@@ -72,9 +72,9 @@ Yeni bayi **Kayıt ol** ekranından hesap açabilir.
 
 ## Ne yapılır
 
-**Bayi:** kayıt/giriş, ana sayfa slider, dinamik ürün grid, SQL arama, ürün popup, sepete ekleme, sepet güncelle/sil, sipariş oluştur (stok backend’de kontrol edilir), Siparişlerim.
+**Bayi:** kayıt veya girişten sonra ana sayfaya düşer. Slider, dinamik ürün grid, SQL arama, ürün detayı popup (JS yoksa tam sayfa), sepete ekleme, sepet güncelle/sil, sipariş oluştur (stok backend’de kontrol edilir), Siparişlerim.
 
-**Yönetici:** ürün ve kullanıcı, sipariş onay/red, slider, grid kolon ayarı (alan, başlık, sıra, render tipi, cihaz görünürlüğü — kod değişikliği gerekmez).
+**Yönetici:** girişten sonra da ana sayfaya düşer; sipariş veremez. Üst menüdeki **Yönetim** ile ürün, kullanıcı, sipariş onay/red, slider ve grid kolonlarını yönetir (alan, başlık, sıra, render tipi, cihaz görünürlüğü — kod değişikliği gerekmez).
 
 Stok göstergesi ürünün `CriticalStockLevel` değerine göre: Var / Kritik / Yok.
 
