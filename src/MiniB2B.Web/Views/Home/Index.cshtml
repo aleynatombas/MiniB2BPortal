@@ -113,7 +113,7 @@
                 @foreach (var category in Model.Categories.OrderBy(c => c.Name == "Fren Sistemi" ? 0 : 1))
                 {
                     partPhotos.TryGetValue(category.Name, out var photo);
-                    <a class="part-tile @(category.Name == "Fren Sistemi" ? "featured" : null)" asp-controller="Products" asp-action="Index" asp-route-term="@category.Name">
+                    <a class="part-tile" asp-controller="Products" asp-action="Index" asp-route-term="@category.Name">
                         @if (!string.IsNullOrWhiteSpace(photo))
                         {
                             <img src="@photo" alt="@category.Name" />

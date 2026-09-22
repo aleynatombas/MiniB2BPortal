@@ -11,7 +11,7 @@
     var popupUrl = Url.Action("Details", "Products", new { area = "", id = Model.Id, returnTo = "home", partial = true });
 }
 <article class="product-card">
-    <a href="@detailUrl" class="js-product-detail text-decoration-none text-reset" data-detail-url="@popupUrl" data-product-name="@Model.Name">
+    <a href="@detailUrl" class="product-card-media js-product-detail text-decoration-none text-reset" data-detail-url="@popupUrl" data-product-name="@Model.Name">
         @if (!string.IsNullOrWhiteSpace(Model.ImagePath))
         {
             <img src="@Model.ImagePath" alt="@Model.Name" />
