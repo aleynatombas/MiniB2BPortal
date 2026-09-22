@@ -69,6 +69,12 @@
                     <td class="d-none d-md-table-cell">@(item.IsActive ? "Aktif" : "Pasif")</td>
                     <td class="text-end">
                         <a asp-action="Edit" asp-route-id="@item.Id">Düzenle</a>
+                        <span class="text-muted">·</span>
+                        <form asp-action="SetActive" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <input type="hidden" name="isActive" value="@((!item.IsActive).ToString().ToLowerInvariant())" />
+                            <button type="submit" class="btn btn-link btn-sm p-0 align-baseline">@(item.IsActive ? "Pasifleştir" : "Yayınla")</button>
+                        </form>
                     </td>
                 </tr>
             }

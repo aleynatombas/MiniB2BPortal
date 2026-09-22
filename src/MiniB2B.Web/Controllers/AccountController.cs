@@ -24,7 +24,7 @@ public class AccountController : Controller
     public IActionResult Login(string? returnUrl = null)
     {
         if (User.Identity?.IsAuthenticated == true)
-            return RedirectToLocal(returnUrl);
+            return RedirectToAction("Index", "Home");
 
         return View(new LoginViewModel { ReturnUrl = returnUrl });
     }
@@ -46,7 +46,7 @@ public class AccountController : Controller
             }, cancellationToken);
 
             await SignInAsync(user);
-            return RedirectToLocal(model.ReturnUrl);
+            return RedirectToAction("Index", "Home");
         }
         catch (BusinessException ex)
         {
@@ -129,11 +129,4 @@ public class AccountController : Controller
             });
     }
 
-    private IActionResult RedirectToLocal(string? returnUrl)
-    {
-        if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
-            return Redirect(returnUrl);
-
-        return RedirectToAction("Index", "Home");
-    }
 }

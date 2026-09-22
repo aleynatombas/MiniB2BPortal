@@ -34,13 +34,13 @@
                     <ul class="navbar-nav mx-lg-4">
                         <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Ana sayfa</a></li>
                         <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Products" asp-action="Index">Ürünler</a></li>
-                        @if (User.Identity?.IsAuthenticated == true)
+                        @if (User.IsAdmin())
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Yönetim</a></li>
+                        }
+                        else if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Orders" asp-action="Index">Siparişlerim</a></li>
-                            @if (User.IsAdmin())
-                            {
-                                <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Yönetim</a></li>
-                            }
                         }
                     </ul>
                     <form class="header-search ms-lg-auto" asp-area="" asp-controller="Products" asp-action="Index" method="get">
@@ -50,7 +50,10 @@
                     <div class="header-actions">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <a class="icon-link" asp-area="" asp-controller="Cart" asp-action="Index">Sepet</a>
+                            @if (!User.IsAdmin())
+                            {
+                                <a class="icon-link" asp-area="" asp-controller="Cart" asp-action="Index">Sepet</a>
+                            }
                             <span class="header-user">@User.GetFullName()</span>
                             <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="m-0">
                                 <button type="submit" class="btn btn-ghost">Çıkış</button>
@@ -83,7 +86,10 @@
                     <h3>Mağaza</h3>
                     <a asp-controller="Home" asp-action="Index">Ana sayfa</a>
                     <a asp-controller="Products" asp-action="Index">Ürünler</a>
-                    <a asp-controller="Cart" asp-action="Index">Sepet</a>
+                    @if (!User.IsAdmin())
+                    {
+                        <a asp-controller="Cart" asp-action="Index">Sepet</a>
+                    }
                 </div>
                 <div class="col-md-3">
                     <h3>Hesap</h3>
@@ -100,8 +106,20 @@
             <div class="footer-bottom">© @DateTime.Now.Year OtoBayi</div>
         </div>
     </footer>
+    <div class="modal fade product-detail-modal" id="productDetailModal" tabindex="-1" aria-labelledby="productDetailTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title h5 mb-0" id="productDetailTitle">Ürün detayı</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body" id="productDetailBody"></div>
+            </div>
+        </div>
+    </div>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

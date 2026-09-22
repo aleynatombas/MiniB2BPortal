@@ -23,6 +23,21 @@ public class UsersController : AdminController
     }
 
     [HttpGet]
+    public async Task<IActionResult> Details(int id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var user = await _users.GetByIdAsync(id, cancellationToken);
+            return View(user);
+        }
+        catch (BusinessException ex)
+        {
+            TempData["Error"] = ex.Message;
+            return RedirectToAction(nameof(Index));
+        }
+    }
+
+    [HttpGet]
     public async Task<IActionResult> Edit(int id, CancellationToken cancellationToken)
     {
         var user = await _users.GetByIdAsync(id, cancellationToken);

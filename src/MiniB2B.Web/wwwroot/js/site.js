@@ -1,4 +1,41 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿(function () {
+  const modalEl = document.getElementById("productDetailModal");
+  const bodyEl = document.getElementById("productDetailBody");
+  const titleEl = document.getElementById("productDetailTitle");
+  if (!modalEl || !bodyEl || !titleEl || !window.bootstrap) return;
 
-// Write your JavaScript code.
+  const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+  document.addEventListener("click", function (e) {
+    const link = e.target.closest("a.js-product-detail");
+    if (!link) return;
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+    const url = link.getAttribute("data-detail-url");
+    if (!url) return;
+
+    e.preventDefault();
+    titleEl.textContent = link.getAttribute("data-product-name") || "Ürün detayı";
+    bodyEl.innerHTML = '<p class="text-muted mb-0">Yükleniyor…</p>';
+    modal.show();
+
+    fetch(url, {
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+        "Accept": "text/html"
+      }
+    }).then(function (res) {
+      if (!res.ok) throw new Error();
+      if (res.url && res.url.indexOf("/Account/Login") !== -1) {
+        window.location.href = link.href;
+        return "";
+      }
+      return res.text();
+    }).then(function (html) {
+      if (!html) return;
+      bodyEl.innerHTML = html;
+    }).catch(function () {
+      window.location.href = link.href;
+    });
+  });
+})();

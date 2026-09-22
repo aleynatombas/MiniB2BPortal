@@ -72,33 +72,3 @@
 </div>
 </div>
 </div>
-
-<div class="modal fade" id="productDetailModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title h5 mb-0">Ürün detayı</h2>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
-            </div>
-            <div class="modal-body" id="productDetailBody"></div>
-        </div>
-    </div>
-</div>
-
-@section Scripts {
-    <script>
-        document.querySelectorAll("[data-product-detail]").forEach(function (el) {
-            el.addEventListener("click", async function (e) {
-                e.preventDefault();
-                const id = el.getAttribute("data-product-detail");
-                const term = el.getAttribute("data-term") || "";
-                const response = await fetch("/Products/Details/" + id + "?term=" + encodeURIComponent(term), {
-                    headers: { "X-Requested-With": "XMLHttpRequest" }
-                });
-                if (!response.ok) return;
-                document.getElementById("productDetailBody").innerHTML = await response.text();
-                bootstrap.Modal.getOrCreateInstance(document.getElementById("productDetailModal")).show();
-            });
-        });
-    </script>
-}

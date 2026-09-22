@@ -6,24 +6,36 @@
     var badgeCss = level == StockLevel.Available ? "stock-ok" : level == StockLevel.Critical ? "stock-low" : "stock-out";
 }
 
+@{
+    var detailUrl = Url.Action("Details", "Products", new { area = "", id = Model.Id, returnTo = "home" });
+    var popupUrl = Url.Action("Details", "Products", new { area = "", id = Model.Id, returnTo = "home", partial = true });
+}
 <article class="product-card">
-    @if (!string.IsNullOrWhiteSpace(Model.ImagePath))
-    {
-        <img src="@Model.ImagePath" alt="@Model.Name" />
-    }
-    else
-    {
-        <div class="card-ph">Görsel yok</div>
-    }
+    <a href="@detailUrl" class="js-product-detail text-decoration-none text-reset" data-detail-url="@popupUrl" data-product-name="@Model.Name">
+        @if (!string.IsNullOrWhiteSpace(Model.ImagePath))
+        {
+            <img src="@Model.ImagePath" alt="@Model.Name" />
+        }
+        else
+        {
+            <div class="card-ph">Görsel yok</div>
+        }
+    </a>
     <div class="body">
         <div class="d-flex justify-content-between align-items-start gap-2">
             <span class="brand">@Model.Brand</span>
             <span class="stock-badge @badgeCss">@badge</span>
         </div>
-        <h3>@Model.Name</h3>
+        <h3>
+            <a href="@detailUrl" class="js-product-detail text-decoration-none text-reset" data-detail-url="@popupUrl" data-product-name="@Model.Name">@Model.Name</a>
+        </h3>
         <div class="small text-muted">@Model.ProductCode</div>
         <div class="price">@Model.Price.ToString("N2") ₺</div>
-        @if (User.Identity?.IsAuthenticated == true)
+        @if (User.IsAdmin())
+        {
+            <a class="btn btn-primary w-100 mt-2" asp-area="Admin" asp-controller="Products" asp-action="Edit" asp-route-id="@Model.Id">Ürünü yönet</a>
+        }
+        else if (User.Identity?.IsAuthenticated == true)
         {
             <form asp-controller="Products" asp-action="AddToCart" method="post" class="mt-2">
                 <input type="hidden" name="productId" value="@Model.Id" />
@@ -34,7 +46,7 @@
         }
         else
         {
-            <a class="btn btn-primary w-100 mt-2" asp-controller="Account" asp-action="Login" asp-route-returnUrl="/Products">Giriş yapıp sipariş ver</a>
+            <a class="btn btn-primary w-100 mt-2" asp-controller="Account" asp-action="Login">Giriş yapıp sipariş ver</a>
         }
     </div>
 </article>

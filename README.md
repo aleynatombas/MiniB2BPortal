@@ -72,9 +72,9 @@ Yeni bayi **Kayıt ol** ekranından hesap açabilir.
 
 ## Ne yapılır
 
-**Bayi:** kayıt veya girişten sonra ana sayfaya düşer. Slider, dinamik ürün grid, SQL arama, ürün detayı popup (JS yoksa tam sayfa), sepete ekleme, sepet güncelle/sil, sipariş oluştur (stok backend’de kontrol edilir), Siparişlerim.
+**Bayi:** kayıt veya girişten sonra ana sayfaya düşer. Slider, dinamik ürün grid, SQL arama, ürün detayı popup ve tam sayfa, sepete ekleme, sepet güncelle/sil, sipariş oluştur (stok backend’de kontrol edilir), Siparişlerim.
 
-**Yönetici:** girişten sonra da ana sayfaya düşer; sipariş veremez. Üst menüdeki **Yönetim** ile ürün, kullanıcı, sipariş onay/red, slider ve grid kolonlarını yönetir (alan, başlık, sıra, render tipi, cihaz görünürlüğü — kod değişikliği gerekmez).
+**Yönetici:** girişten sonra da ana sayfaya düşer; sipariş veremez. Üst menüdeki **Yönetim** ile ürün (ekle/düzenle/pasifleştir), kullanıcı görüntüle/düzenle, sipariş onay/red, slider ve grid kolonlarını yönetir.
 
 Stok göstergesi ürünün `CriticalStockLevel` değerine göre: Var / Kritik / Yok.
 

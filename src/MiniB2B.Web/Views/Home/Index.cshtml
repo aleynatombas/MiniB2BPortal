@@ -87,6 +87,15 @@
 {
     <div class="container pt-4"><div class="alert alert-danger">@error</div></div>
 }
+@if (User.IsAdmin())
+{
+    <div class="container pt-4">
+        <div class="alert alert-info mb-0">
+            Yönetici vitrini görüntülüyor; sipariş verilemez.
+            <a class="alert-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Yönetim paneline git</a>
+        </div>
+    </div>
+}
 
 @if (Model.Categories.Count > 0)
 {

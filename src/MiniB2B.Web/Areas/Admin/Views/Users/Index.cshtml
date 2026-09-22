@@ -36,7 +36,11 @@
                 <td>@item.Phone</td>
                 <td>@(item.Role == UserRole.Admin ? "Yönetici" : "Bayi")</td>
                 <td>@(item.IsActive ? "Aktif" : "Pasif")</td>
-                <td class="text-end"><a asp-action="Edit" asp-route-id="@item.Id">Düzenle</a></td>
+                <td class="text-end">
+                    <a asp-action="Details" asp-route-id="@item.Id">Görüntüle</a>
+                    <span class="text-muted">·</span>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Düzenle</a>
+                </td>
             </tr>
         }
         </tbody>

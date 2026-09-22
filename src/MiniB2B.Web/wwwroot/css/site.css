@@ -493,3 +493,8 @@ body.admin-body {
   .qty-input { max-width: 56px; }
   .modal-dialog { margin: 0.75rem; }
 }
+
+.product-detail { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 1.5rem; }
+.product-detail-modal .modal-content { border: 1px solid var(--line); border-radius: var(--radius); }
+.product-detail-modal .modal-header { border-bottom-color: var(--line); }
+.product-detail-modal .modal-body h3 { display: none; }

@@ -2,6 +2,7 @@ using MiniB2B.Business.Exceptions;
 using MiniB2B.Business.Services;
 using MiniB2B.Web.Infrastructure;
 using MiniB2B.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MiniB2B.Web.Controllers;
@@ -30,7 +31,8 @@ public class ProductsController : Controller
         return View(model);
     }
 
-    public async Task<IActionResult> Details(int id, string? term, CancellationToken cancellationToken)
+    [AllowAnonymous]
+    public async Task<IActionResult> Details(int id, string? term, string? returnTo, bool partial = false, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -39,7 +41,13 @@ public class ProductsController : Controller
                 return NotFound();
 
             ViewBag.Term = term;
-            return PartialView("_Details", product);
+            ViewBag.ReturnTo = returnTo ?? (WantsPartial(partial) ? null : "details");
+            ViewData["Title"] = product.Name;
+
+            if (WantsPartial(partial))
+                return PartialView("_Details", product);
+
+            return View(product);
         }
         catch (BusinessException)
         {
@@ -51,6 +59,12 @@ public class ProductsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddToCart(int productId, int quantity = 1, string? term = null, string? returnTo = null, CancellationToken cancellationToken = default)
     {
+        if (User.IsAdmin())
+        {
+            TempData["Error"] = "Yöneticiler sipariş vermez. Ürün ve siparişleri yönetim panelinden yönetirsiniz.";
+            return RedirectToAction("Index", "Home");
+        }
+
         try
         {
             await _cart.AddItemAsync(User.GetUserId(), productId, quantity, cancellationToken);
@@ -63,7 +77,18 @@ public class ProductsController : Controller
 
         if (string.Equals(returnTo, "home", StringComparison.OrdinalIgnoreCase))
             return RedirectToAction("Index", "Home");
+        if (string.Equals(returnTo, "details", StringComparison.OrdinalIgnoreCase))
+            return RedirectToAction(nameof(Details), new { id = productId });
 
         return RedirectToAction(nameof(Index), new { term });
+    }
+
+    private bool WantsPartial(bool partial)
+    {
+        if (partial)
+            return true;
+
+        var requestedWith = Request.Headers["X-Requested-With"].ToString();
+        return string.Equals(requestedWith, "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
     }
 }

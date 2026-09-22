@@ -46,11 +46,23 @@
         {
             <p>@Model.Description</p>
         }
-        <form asp-action="AddToCart" method="post" class="d-flex gap-2 align-items-center">
-            <input type="hidden" name="productId" value="@Model.Id" />
-            <input type="hidden" name="term" value="@ViewBag.Term" />
-            <input type="number" name="quantity" class="form-control" style="max-width:100px" value="1" min="1" max="@Math.Max(Model.StockQuantity, 1)" @(inStock ? null : "disabled") />
-            <button type="submit" class="btn btn-primary" @(inStock ? null : "disabled")>Sepete ekle</button>
-        </form>
+        @if (User.IsAdmin())
+        {
+            <a class="btn btn-primary" asp-area="Admin" asp-controller="Products" asp-action="Edit" asp-route-id="@Model.Id">Ürünü yönet</a>
+        }
+        else if (User.Identity?.IsAuthenticated == true)
+        {
+            <form asp-area="" asp-controller="Products" asp-action="AddToCart" method="post" class="d-flex gap-2 align-items-center">
+                <input type="hidden" name="productId" value="@Model.Id" />
+                <input type="hidden" name="term" value="@ViewBag.Term" />
+                <input type="hidden" name="returnTo" value="@(ViewBag.ReturnTo as string)" />
+                <input type="number" name="quantity" class="form-control" style="max-width:100px" value="1" min="1" max="@Math.Max(Model.StockQuantity, 1)" @(inStock ? null : "disabled") />
+                <button type="submit" class="btn btn-primary" @(inStock ? null : "disabled")>Sepete ekle</button>
+            </form>
+        }
+        else
+        {
+            <a class="btn btn-primary" asp-controller="Account" asp-action="Login">Giriş yapıp sipariş ver</a>
+        }
     </div>
 </div>

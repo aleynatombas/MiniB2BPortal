@@ -102,6 +102,23 @@ public class ProductsController : AdminController
         }
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SetActive(int id, bool isActive, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _products.SetActiveAsync(id, isActive, cancellationToken);
+            TempData["Success"] = isActive ? "Ürün yeniden yayınlandı." : "Ürün pasifleştirildi. Katalogda görünmez; eski siparişler durur.";
+        }
+        catch (BusinessException ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
     private async Task FillCategories(int selectedId, CancellationToken cancellationToken)
     {
         var categories = await _categories.GetAllAsync(cancellationToken);

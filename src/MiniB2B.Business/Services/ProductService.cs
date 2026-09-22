@@ -42,6 +42,19 @@ public class ProductService : IProductService
         return products.Select(Map).ToList();
     }
 
+    public async Task<List<ProductDto>> GetFeaturedAsync(int take, CancellationToken cancellationToken = default)
+    {
+        var products = await _unitOfWork.Products.Query()
+            .AsNoTracking()
+            .Include(p => p.Category)
+            .Where(p => p.IsActive)
+            .OrderBy(p => p.Name)
+            .Take(take)
+            .ToListAsync(cancellationToken);
+
+        return products.Select(Map).ToList();
+    }
+
     public Task<int> CountAsync(CancellationToken cancellationToken = default)
         => _unitOfWork.Products.Query().CountAsync(cancellationToken);
 
@@ -122,6 +135,16 @@ public class ProductService : IProductService
         product.IsActive = dto.IsActive;
         product.UpdatedAt = DateTime.UtcNow;
 
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task SetActiveAsync(int id, bool isActive, CancellationToken cancellationToken = default)
+    {
+        var product = await _unitOfWork.Products.GetByIdAsync(id, cancellationToken)
+            ?? throw new BusinessException("Ürün bulunamadı.");
+
+        product.IsActive = isActive;
+        product.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 

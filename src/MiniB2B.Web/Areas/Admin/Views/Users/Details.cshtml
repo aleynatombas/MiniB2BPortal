@@ -1,0 +1,35 @@
+@model UserDto
+@{
+    ViewData["Title"] = "Kullanıcı detayı";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="h3 mb-0">Kullanıcı detayı</h1>
+    <div class="d-flex gap-2">
+        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.Id">Düzenle</a>
+        <a class="btn btn-outline-secondary" asp-action="Index">Listeye dön</a>
+    </div>
+</div>
+
+<div class="stat-card">
+    <dl class="row mb-0">
+        <dt class="col-sm-3">Ad</dt>
+        <dd class="col-sm-9">@Model.FirstName</dd>
+        <dt class="col-sm-3">Soyad</dt>
+        <dd class="col-sm-9">@Model.LastName</dd>
+        <dt class="col-sm-3">E-posta</dt>
+        <dd class="col-sm-9">@Model.Email</dd>
+        <dt class="col-sm-3">Telefon</dt>
+        <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Phone) ? "—" : Model.Phone)</dd>
+        <dt class="col-sm-3">Kullanıcı adı</dt>
+        <dd class="col-sm-9">@Model.Username</dd>
+        <dt class="col-sm-3">Şifre</dt>
+        <dd class="col-sm-9">Güvenli saklanıyor (hash). Açık metin tutulmaz.</dd>
+        <dt class="col-sm-3">Rol</dt>
+        <dd class="col-sm-9">@(Model.Role == UserRole.Admin ? "Yönetici" : "Bayi")</dd>
+        <dt class="col-sm-3">Durum</dt>
+        <dd class="col-sm-9">@(Model.IsActive ? "Aktif" : "Pasif")</dd>
+        <dt class="col-sm-3">Kayıt tarihi</dt>
+        <dd class="col-sm-9">@Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</dd>
+    </dl>
+</div>

@@ -22,12 +22,11 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        var products = await _products.SearchAsync(null, activeOnly: true, cancellationToken);
         return View(new HomeViewModel
         {
             Sliders = await _sliders.GetActiveAsync(cancellationToken),
             Categories = await _categories.GetAllAsync(cancellationToken),
-            Featured = products.Take(8).ToList()
+            Featured = await _products.GetFeaturedAsync(8, cancellationToken)
         });
     }
 

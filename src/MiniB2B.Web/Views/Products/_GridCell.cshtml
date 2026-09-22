@@ -3,12 +3,14 @@
     var column = Model.Column;
     var product = Model.Product;
     var inStock = product.StockQuantity > 0;
+    var detailUrl = Url.Action("Details", "Products", new { area = "", id = product.Id, term = Model.Term });
+    var popupUrl = Url.Action("Details", "Products", new { area = "", id = product.Id, term = Model.Term, partial = true });
 }
 
 @switch (column.RenderType)
 {
     case GridRenderType.Image:
-        <a href="#" data-product-detail="@product.Id" data-term="@Model.Term">
+        <a href="@detailUrl" class="js-product-detail" data-detail-url="@popupUrl" data-product-name="@product.Name">
             @if (!string.IsNullOrWhiteSpace(product.ImagePath))
             {
                 <img src="@product.ImagePath" alt="@product.Name" width="48" height="48" class="thumb" />
@@ -38,18 +40,32 @@
         break;
 
     case GridRenderType.QuantityInput:
-        <input type="number" name="quantity" class="form-control form-control-sm qty-input" value="1" min="1" max="@Math.Max(product.StockQuantity, 1)" form="cart-@product.Id" @(inStock ? null : "disabled") />
+        if (User.IsAdmin())
+        {
+            <span class="text-muted">—</span>
+        }
+        else
+        {
+            <input type="number" name="quantity" class="form-control form-control-sm qty-input" value="1" min="1" max="@Math.Max(product.StockQuantity, 1)" form="cart-@product.Id" @(inStock ? null : "disabled") />
+        }
         break;
 
     case GridRenderType.AddToCartButton:
-        <form id="cart-@product.Id" asp-action="AddToCart" method="post">
-            <input type="hidden" name="productId" value="@product.Id" />
-            <input type="hidden" name="term" value="@Model.Term" />
-            <button type="submit" class="btn btn-sm btn-primary" @(inStock ? null : "disabled")>Sepete ekle</button>
-        </form>
+        if (User.IsAdmin())
+        {
+            <span class="text-muted small">Yalnızca yönetim</span>
+        }
+        else
+        {
+            <form id="cart-@product.Id" asp-action="AddToCart" method="post">
+                <input type="hidden" name="productId" value="@product.Id" />
+                <input type="hidden" name="term" value="@Model.Term" />
+                <button type="submit" class="btn btn-sm btn-primary" @(inStock ? null : "disabled")>Sepete ekle</button>
+            </form>
+        }
         break;
 
     default:
-        <a href="#" data-product-detail="@product.Id" data-term="@Model.Term">@ProductFieldAccessor.GetText(product, column.FieldName)</a>
+        <a href="@detailUrl" class="js-product-detail" data-detail-url="@popupUrl" data-product-name="@product.Name">@ProductFieldAccessor.GetText(product, column.FieldName)</a>
         break;
 }
