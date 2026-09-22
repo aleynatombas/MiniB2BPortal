@@ -3,29 +3,28 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - OtoBayi</title>
+    <title>@ViewData["Title"] - OtoTedarik B2B</title>
+    <link rel="icon" type="image/png" href="~/uploads/brand/favicon.png" asp-append-version="true" />
+    <link rel="shortcut icon" href="~/favicon.ico" asp-append-version="true" />
+    <link rel="apple-touch-icon" href="~/uploads/brand/apple-touch-icon.png" asp-append-version="true" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body class="store">
+<body class="store@(ViewData["HideFooter"] as bool? == true ? " is-auth" : "")">
     <div class="topbar">
         <div class="container d-flex flex-wrap justify-content-between gap-2">
-            <span>OEM kodlu yedek parça · İstanbul içi 24 saat</span>
-            <span class="topbar-extra">Servis desteği · Stoktan teslim · Güvenli sipariş</span>
+            <span>0212 000 00 01</span>
+            <span class="topbar-extra">OEM kod · Stoktan teslim · 24 saat</span>
         </div>
     </div>
     <header class="store-header">
         <nav class="navbar navbar-expand-lg">
             <div class="container">
                 <a class="brand" asp-area="" asp-controller="Home" asp-action="Index">
-                    <span class="brand-mark">OB</span>
-                    <span>
-                        <strong>OtoBayi</strong>
-                        <small>Yedek parça portalı</small>
-                    </span>
+                    <partial name="_Brand" />
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Menüyü aç">
                     <span class="navbar-toggler-icon"></span>
@@ -52,7 +51,7 @@
                         {
                             @if (!User.IsAdmin())
                             {
-                                <a class="icon-link" asp-area="" asp-controller="Cart" asp-action="Index">Sepet</a>
+                                @await Component.InvokeAsync("CartBadge")
                             }
                             <span class="header-user">@User.GetFullName()</span>
                             <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="m-0">
@@ -72,17 +71,20 @@
     <main>
         @RenderBody()
     </main>
+    @if (ViewData["HideFooter"] as bool? != true)
+    {
     <footer class="store-footer">
         <div class="container">
             <div class="row g-4">
-                <div class="col-md-4">
+                <div class="col-lg-3">
                     <div class="brand mb-3">
-                        <span class="brand-mark">OB</span>
-                        <span><strong>OtoBayi</strong></span>
+                        <partial name="_Brand" />
                     </div>
                     <p>Servis ve bayilere özel stoktan teslim fren, filtre, ateşleme ve aydınlatma parçaları.</p>
+                    <p class="mb-1">0212 000 00 01</p>
+                    <p class="mb-0">destek@otobayi.com</p>
                 </div>
-                <div class="col-md-2">
+                <div class="col-6 col-lg-2">
                     <h3>Mağaza</h3>
                     <a asp-controller="Home" asp-action="Index">Ana sayfa</a>
                     <a asp-controller="Products" asp-action="Index">Ürünler</a>
@@ -91,21 +93,57 @@
                         <a asp-controller="Cart" asp-action="Index">Sepet</a>
                     }
                 </div>
-                <div class="col-md-3">
+                <div class="col-6 col-lg-2">
                     <h3>Hesap</h3>
-                    <a asp-controller="Account" asp-action="Login">Giriş</a>
-                    <a asp-controller="Account" asp-action="Register">Bayi kaydı</a>
-                    <a asp-controller="Orders" asp-action="Index">Siparişlerim</a>
+                    @if (User.IsAdmin())
+                    {
+                        <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Yönetim paneli</a>
+                    }
+                    else if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <a asp-controller="Orders" asp-action="Index">Siparişlerim</a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" asp-route-portal="customer">Kullanıcı girişi</a>
+                        <a asp-controller="Account" asp-action="Register">Bayi kaydı</a>
+                        <a asp-controller="Account" asp-action="Login" asp-route-portal="admin">Yönetici girişi</a>
+                    }
                 </div>
-                <div class="col-md-3">
-                    <h3>Destek</h3>
-                    <p class="mb-1">0212 000 00 01</p>
-                    <p class="mb-0">destek@otobayi.com</p>
+                <div class="col-lg-3">
+                    <h3>Navigasyon</h3>
+                    <div class="footer-map">
+                        <div class="footer-map-canvas" aria-hidden="true">
+                            <svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="640" height="220" fill="#e7edf3" />
+                                <path fill="#c9d7e4" d="M0 148c90-18 150 22 250 8 40-6 70 18 120 10V220H0Z" />
+                                <path fill="#c9d7e4" d="M318 0h38l18 96-22 124h-42l20-120Z" />
+                                <path fill="#c9d7e4" d="M356 108c42 6 90-16 160-8 50 6 80 28 124 18v102H334Z" />
+                                <g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round">
+                                    <path d="M24 52h250" /><path d="M18 92h270" /><path d="M40 128h210" />
+                                    <path d="M96 28v120" /><path d="M168 22v140" /><path d="M238 36v110" />
+                                    <path d="M400 44h210" /><path d="M388 88h230" />
+                                    <path d="M460 24v150" /><path d="M540 36v130" />
+                                </g>
+                                <g transform="translate(198 58)">
+                                    <path d="M0-28c10 0 18 8 18 18 0 14-18 32-18 32S-18 4-18-10c0-10 8-18 18-18z" fill="#dc2626" />
+                                    <circle cy="-10" r="6" fill="#fff" />
+                                </g>
+                                <text x="228" y="48" fill="#111" font-size="13" font-family="Manrope, Segoe UI, sans-serif" font-weight="700">Depo</text>
+                            </svg>
+                        </div>
+                        <div class="footer-map-meta">
+                            <strong>İkitelli OSB depo</strong>
+                            <span>Oto Sanayi, Başakşehir / İstanbul · İstanbul içi 24 saat hazırlık</span>
+                            <a href="https://www.openstreetmap.org/?mlat=41.071&amp;mlon=28.803#map=15/41.071/28.803" target="_blank" rel="noopener noreferrer">Yol tarifi</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="footer-bottom">© @DateTime.Now.Year OtoBayi</div>
+            <div class="footer-bottom">© @DateTime.Now.Year OtoTedarik B2B</div>
         </div>
     </footer>
+    }
     <div class="modal fade product-detail-modal" id="productDetailModal" tabindex="-1" aria-labelledby="productDetailTitle" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">

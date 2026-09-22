@@ -4,6 +4,7 @@
 }
 
 <section class="hero">
+    <img class="hero-car" src="~/uploads/sliders/hero-car.png" asp-append-version="true" alt="" />
     <div class="container">
         @if (Model.Sliders.Count > 0)
         {
@@ -21,24 +22,25 @@
                     @for (var i = 0; i < Model.Sliders.Count; i++)
                     {
                         var slide = Model.Sliders[i];
+                        var hasImage = !string.IsNullOrWhiteSpace(slide.ImagePath);
                         <div class="carousel-item @(i == 0 ? "active" : null)">
-                            <div class="hero-slide">
+                            <div class="hero-slide @(hasImage ? "has-media" : null)">
                                 <div>
                                     <p class="hero-kicker">@slide.Title</p>
                                     <h1>@(string.IsNullOrWhiteSpace(slide.Subtitle) ? slide.Title : slide.Subtitle)</h1>
                                     <div class="d-flex gap-2 flex-wrap">
-                                        <a class="btn btn-primary" href="@(string.IsNullOrWhiteSpace(slide.LinkUrl) ? "/Products" : slide.LinkUrl)">Alışverişe başla</a>
-                                        <a class="btn btn-ghost" asp-controller="Products" asp-action="Index">Katalogu incele</a>
+                                        <a class="btn btn-primary" href="@(string.IsNullOrWhiteSpace(slide.LinkUrl) ? "/Products" : slide.LinkUrl)">Kampanyaya git</a>
+                                        <a class="btn btn-ghost" asp-controller="Products" asp-action="Index">Tüm parçalar</a>
                                     </div>
                                 </div>
                                 <div class="hero-visual">
-                                    @if (!string.IsNullOrWhiteSpace(slide.ImagePath))
+                                    @if (hasImage)
                                     {
                                         <img src="@slide.ImagePath" alt="@slide.Title" />
                                     }
                                     else
                                     {
-                                        <div class="hero-fallback">OB</div>
+                                        <div class="hero-fallback">OT</div>
                                     }
                                 </div>
                             </div>
@@ -62,20 +64,14 @@
         {
             <div class="hero-slide">
                 <div>
-                    <p class="hero-kicker">OtoBayi</p>
+                    <p class="hero-kicker">OtoTedarik B2B</p>
                     <h1>Servis stoğu. OEM kodlu parça.</h1>
                     <p>Fren, filtre, ateşleme ve aydınlatma parçalarını tek yerden sipariş edin.</p>
                     <a class="btn btn-primary" asp-controller="Products" asp-action="Index">Alışverişe başla</a>
                 </div>
-                <div class="hero-visual"><div class="hero-fallback">OB</div></div>
+                <div class="hero-visual"><div class="hero-fallback">OT</div></div>
             </div>
         }
-        <div class="trust-row">
-            <div class="trust-item">Stoktan teslim</div>
-            <div class="trust-item">OEM kod</div>
-            <div class="trust-item">Bayi fiyatı</div>
-            <div class="trust-item">24s sevkiyat</div>
-        </div>
     </div>
 </section>
 
@@ -102,15 +98,30 @@
     <section class="section">
         <div class="container">
             <div class="section-title">
-                <span>KATEGORİLER</span>
-                <h2>Kategoriye göre alışveriş</h2>
+                <h2>Parçalarımız</h2>
             </div>
-            <div class="cat-grid">
-                @foreach (var category in Model.Categories)
+            <div class="part-grid">
+                @{
+                    var partPhotos = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["Fren Sistemi"] = "/uploads/products/disc-caliper.jpg",
+                        ["Filtreler"] = "/uploads/products/oil-filter.jpg",
+                        ["Ateşleme"] = "/uploads/products/spark-plug.jpg",
+                        ["Aydınlatma"] = "/uploads/products/h7-bulb.jpg"
+                    };
+                }
+                @foreach (var category in Model.Categories.OrderBy(c => c.Name == "Fren Sistemi" ? 0 : 1))
                 {
-                    <a class="cat-card" asp-controller="Products" asp-action="Index" asp-route-term="@category.Name">
-                        <div class="cat-icon">@(category.Name.Length >= 2 ? category.Name[..2] : category.Name)</div>
-                        <strong>@category.Name</strong>
+                    partPhotos.TryGetValue(category.Name, out var photo);
+                    <a class="part-tile @(category.Name == "Fren Sistemi" ? "featured" : null)" asp-controller="Products" asp-action="Index" asp-route-term="@category.Name">
+                        @if (!string.IsNullOrWhiteSpace(photo))
+                        {
+                            <img src="@photo" alt="@category.Name" />
+                        }
+                        <div class="part-meta">
+                            <strong>@category.Name</strong>
+                            <span>İncele</span>
+                        </div>
                     </a>
                 }
             </div>
@@ -149,10 +160,71 @@
         </div>
         <a class="btn btn-primary" asp-controller="Products" asp-action="Index">Kataloga git</a>
     </div>
-    <div class="stats mt-4">
-        <div class="stat"><strong>12+</strong>ürün çeşidi</div>
-        <div class="stat"><strong>4</strong>ana kategori</div>
-        <div class="stat"><strong>24s</strong>hazırlık</div>
-        <div class="stat"><strong>%100</strong>stok kontrolü</div>
-    </div>
 </div>
+
+@{
+    var partners = new (string Name, string File)[]
+    {
+        ("Bosch", "bosch.svg"),
+        ("TRW", "trw.svg"),
+        ("ATE", "ate.svg"),
+        ("MANN", "mann.svg"),
+        ("Mahle", "mahle.svg"),
+        ("NGK", "ngk.svg"),
+        ("Valeo", "valeo.svg"),
+        ("Osram", "osram.svg"),
+        ("Philips", "philips.svg"),
+        ("Brembo", "brembo.svg"),
+        ("Denso", "denso.svg"),
+        ("Hella", "hella.svg")
+    };
+}
+<section class="brand-marquee" aria-label="Çalıştığımız markalar">
+    <p class="brand-marquee-kicker">Çalıştığımız markalar</p>
+    <div class="brand-marquee-viewport">
+        <div class="brand-marquee-track">
+            @for (var copy = 0; copy < 2; copy++)
+            {
+                <div class="brand-marquee-group" aria-hidden="@(copy == 1 ? "true" : null)">
+                    @foreach (var partner in partners)
+                    {
+                        <span class="brand-chip">
+                            <img src="~/uploads/brands/@partner.File" asp-append-version="true" alt="@partner.Name" />
+                        </span>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-title">
+            <span>NEDEN BİZ</span>
+            <h2>Neden OtoTedarik?</h2>
+        </div>
+        <div class="why-grid">
+            <article class="why-card">
+                <span class="why-num">01</span>
+                <h3>Doğru parça</h3>
+                <p>OEM ve üretici koduyla arayın; servise uygun parçayı bulun.</p>
+            </article>
+            <article class="why-card">
+                <span class="why-num">02</span>
+                <h3>Güncel stok</h3>
+                <p>Siparişte stok kontrol edilir; yetersiz parçada işlem oluşmaz.</p>
+            </article>
+            <article class="why-card">
+                <span class="why-num">03</span>
+                <h3>Hızlı sevkiyat</h3>
+                <p>İstanbul içi siparişler 24 saat içinde hazırlanır.</p>
+            </article>
+            <article class="why-card">
+                <span class="why-num">04</span>
+                <h3>Bayi fiyatı</h3>
+                <p>Servis ve bayilere özel B2B fiyatıyla sipariş verin.</p>
+            </article>
+        </div>
+    </div>
+</section>

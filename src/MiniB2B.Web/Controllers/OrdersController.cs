@@ -2,10 +2,12 @@ using MiniB2B.Business.Dtos;
 using MiniB2B.Business.Exceptions;
 using MiniB2B.Business.Services;
 using MiniB2B.Web.Infrastructure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MiniB2B.Web.Controllers;
 
+[Authorize(Roles = "Customer")]
 public class OrdersController : Controller
 {
     private readonly IOrderService _orders;

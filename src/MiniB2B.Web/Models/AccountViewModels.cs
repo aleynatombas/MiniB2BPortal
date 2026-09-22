@@ -14,6 +14,8 @@ public class LoginViewModel
     public string Password { get; set; } = string.Empty;
 
     public string? ReturnUrl { get; set; }
+
+    public string? Portal { get; set; }
 }
 
 public class RegisterViewModel

@@ -46,6 +46,15 @@ public class CartService : ICartService
         };
     }
 
+    public async Task<int> GetItemCountAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        var total = await _unitOfWork.Carts.Query()
+            .Where(c => c.UserId == userId)
+            .SelectMany(c => c.Items)
+            .SumAsync(i => (int?)i.Quantity, cancellationToken);
+        return total ?? 0;
+    }
+
     public async Task AddItemAsync(int userId, int productId, int quantity, CancellationToken cancellationToken = default)
     {
         EnsureQuantity(quantity);

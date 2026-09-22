@@ -20,7 +20,9 @@ public static class DatabaseSeeder
         else
             await RebrandToAutoPartsAsync(db);
 
+        await RefreshCatalogVisualsAsync(db);
         await FillMissingImagesAsync(db);
+        await EnsureAdminRoleAsync(db);
     }
 
     private static async Task SeedFreshAsync(AppDbContext db)
@@ -107,7 +109,7 @@ public static class DatabaseSeeder
             test.ManufacturerCode = "0265007508";
             test.CustomCode1 = "ABS";
             test.CustomCode2 = "FRONT";
-            test.ImagePath = "/uploads/products/placeholder.svg";
+            test.ImagePath = "/uploads/products/spark-plug.jpg";
             test.UpdatedAt = DateTime.UtcNow;
         }
 
@@ -124,13 +126,47 @@ public static class DatabaseSeeder
 
         var admin = await db.Users.FirstOrDefaultAsync(u => u.Username == "admin");
         if (admin is not null)
+        {
             admin.Email = "admin@otobayi.com";
+            admin.FirstName = "Sistem";
+            admin.LastName = "Yöneticisi";
+            admin.Role = UserRole.Admin;
+            admin.IsActive = true;
+        }
         var dealer = await db.Users.FirstOrDefaultAsync(u => u.Username == "bayi");
         if (dealer is not null)
         {
             dealer.FirstName = "Mehmet";
             dealer.LastName = "Usta";
             dealer.Email = "bayi@otobayi.com";
+        }
+
+        await db.SaveChangesAsync();
+    }
+
+    private static async Task RefreshCatalogVisualsAsync(AppDbContext db)
+    {
+        var products = await db.Products.ToListAsync();
+        foreach (var product in products)
+        {
+            var row = Catalog.FirstOrDefault(c => c.Code == product.ProductCode || c.OldCode == product.ProductCode);
+            if (row is null)
+                continue;
+            ApplyCatalog(product, row, resetStock: false);
+        }
+
+        var abs = products.FirstOrDefault(p => p.ProductCode == "ATS-ABS-ON" || p.ProductCode == "TST-001");
+        if (abs is not null)
+            abs.ImagePath = "/uploads/products/wheel-hub.jpg";
+
+        var sliders = await db.Sliders.OrderBy(s => s.DisplayOrder).ToListAsync();
+        var fresh = CreateSliders();
+        for (var i = 0; i < sliders.Count && i < fresh.Count; i++)
+        {
+            sliders[i].ImagePath = fresh[i].ImagePath;
+            sliders[i].Title = fresh[i].Title;
+            sliders[i].Subtitle = fresh[i].Subtitle;
+            sliders[i].LinkUrl = fresh[i].LinkUrl;
         }
 
         await db.SaveChangesAsync();
@@ -149,6 +185,34 @@ public static class DatabaseSeeder
         await db.SaveChangesAsync();
     }
 
+    private static async Task EnsureAdminRoleAsync(AppDbContext db)
+    {
+        var admin = await db.Users.FirstOrDefaultAsync(u => u.Username == "admin");
+        if (admin is null)
+            return;
+
+        var changed = false;
+        if (admin.Role != UserRole.Admin)
+        {
+            admin.Role = UserRole.Admin;
+            changed = true;
+        }
+        if (!admin.IsActive)
+        {
+            admin.IsActive = true;
+            changed = true;
+        }
+        if (admin.FirstName != "Sistem" || admin.LastName != "Yöneticisi")
+        {
+            admin.FirstName = "Sistem";
+            admin.LastName = "Yöneticisi";
+            changed = true;
+        }
+
+        if (changed)
+            await db.SaveChangesAsync();
+    }
+
     private static List<Category> CreateCategories() =>
     [
         new() { Name = "Fren Sistemi", Description = "Balata, disk, hortum", IsActive = true },
@@ -159,9 +223,9 @@ public static class DatabaseSeeder
 
     private static List<Slider> CreateSliders() =>
     [
-        new() { Title = "Bahar bakımı", Subtitle = "Fren setlerinde %15 bayi iskontosu.", ImagePath = "/uploads/sliders/kampanya.svg", LinkUrl = "/Products?term=Fren", DisplayOrder = 1, IsActive = true },
-        new() { Title = "Öne çıkan: Yağ filtresi", Subtitle = "Mann W712/75 stoktan teslim.", ImagePath = "/uploads/sliders/one-cikan.svg", LinkUrl = "/Products?term=Mann", DisplayOrder = 2, IsActive = true },
-        new() { Title = "Sevkiyat duyurusu", Subtitle = "İstanbul içi siparişler 24 saat içinde hazırlanır.", ImagePath = "/uploads/sliders/duyuru.svg", LinkUrl = "/Orders", DisplayOrder = 3, IsActive = true }
+        new() { Title = "Bahar bakımı", Subtitle = "Fren setlerinde %15 bayi iskontosu.", ImagePath = "/uploads/sliders/kampanya.jpg", LinkUrl = "/Products?term=Fren", DisplayOrder = 1, IsActive = true },
+        new() { Title = "Öne çıkan: Yağ filtresi", Subtitle = "Mann W712/75 stoktan teslim.", ImagePath = "/uploads/sliders/one-cikan.jpg", LinkUrl = "/Products?term=Mann", DisplayOrder = 2, IsActive = true },
+        new() { Title = "Sevkiyat duyurusu", Subtitle = "İstanbul içi siparişler 24 saat içinde hazırlanır.", ImagePath = "/uploads/sliders/duyuru.jpg", LinkUrl = "/Orders", DisplayOrder = 3, IsActive = true }
     ];
 
     private static List<ProductGridColumn> CreateGridColumns() =>
@@ -178,18 +242,18 @@ public static class DatabaseSeeder
 
     private static readonly CatalogRow[] Catalog =
     [
-        new("CVT-M8-20", "FRN-BAL-ON", "Ön Fren Balatası", "Golf / Passat uyumlu seramik balata seti.", "Bosch", "5Q0698151", "GDB1732", "OEM", 120, 20, 890m, 0, "/uploads/products/cvt.svg"),
-        new("SMN-M8", "FRN-DSC-280", "Fren Diski 280 mm", "Havalandırmalı ön disk, 280x22 mm.", "TRW", "DF4859", "280MM", "VENT", 80, 15, 1240m, 0, "/uploads/products/smn.svg"),
-        new("RND-M8", "FRN-HOS-ON", "Ön Fren Hortumu", "ATE hidrolik hortum, EPDM.", "ATE", "330626", "HOSE", null, 4, 10, 285m, 0, "/uploads/products/rnd.svg"),
-        new("KBL-3G15", "FLT-YAG-W712", "Yağ Filtresi W712/75", "Spin-on yağ filtresi, 3/4-16 UNF.", "Mann", "W712/75", "W712", "SPIN", 25, 8, 145m, 1, "/uploads/products/kbl.svg"),
-        new("PRZ-16A", "FLT-HVA-LX", "Hava Filtresi", "Panel hava filtresi, 1.6 TSI.", "Mahle", "LX1780", "AIR", "TSI", 40, 10, 210m, 1, "/uploads/products/prz.svg"),
-        new("SGT-10A", "FLT-YAK-KL", "Yakıt Filtresi", "Dizel hat filtre, 2.0 TDI.", "Bosch", "F026402048", "FUEL", "TDI", 2, 5, 320m, 1, "/uploads/products/sgt.svg"),
-        new("ELD-5L", "ATS-BJU-FR7", "Buji FR7DCX", "Standart buji, 4'lü kutu.", "NGK", "FR7DCX", "SPARK", "4LU", 18, 6, 96m, 2, "/uploads/products/eld.svg"),
-        new("ELD-MOP", "ATS-BOB-IG", "Ateşleme Bobini", "Kalem tip ateşleme bobini.", "Valeo", "245103", "COIL", null, 0, 4, 780m, 2, "/uploads/products/mop.svg"),
-        new("A4-80G", "AYD-FAR-H7", "H7 Far Ampulü", "12V 55W, uzun ömür.", "Osram", "64210", "H7", "12V", 60, 12, 68m, 3, "/uploads/products/a4.svg"),
-        new("KAL-MAVI", "AYD-SIN-LED", "LED Sinyal Lambası", "Canbus uyumlu sarı LED.", "Philips", "WY21W", "LED", "CAN", 9, 10, 185m, 3, "/uploads/products/kal.svg"),
-        new("CVT-M10-30", "FRN-BAL-ARK", "Arka Fren Balatası", "Arka disk balata seti.", "Brembo", "P85075", "REAR", "OEM", 55, 15, 640m, 0, "/uploads/products/cvt10.svg"),
-        new("KBL-3G25", "FLT-POL-CUK", "Polen Filtresi", "Aktif karbon kabin filtresi.", "Mann", "CUK26007", "CABIN", "CARB", 14, 5, 175m, 1, "/uploads/products/kbl25.svg")
+        new("CVT-M8-20", "FRN-BAL-ON", "Ön Fren Balatası", "Golf / Passat uyumlu seramik balata seti.", "Bosch", "5Q0698151", "GDB1732", "OEM", 120, 20, 890m, 0, "/uploads/products/brake-pads.jpg"),
+        new("SMN-M8", "FRN-DSC-280", "Fren Diski 280 mm", "Havalandırmalı ön disk, kırmızı kaliper uyumlu 280x22 mm.", "TRW", "DF4859", "280MM", "VENT", 80, 15, 1240m, 0, "/uploads/products/disc-caliper.jpg"),
+        new("FRN-HOS-ON", "FRN-POY-ON", "Ön Tekerlek Poyrası", "5 bijonlu ön poyra / göbek.", "SKF", "VKBA3643", "HUB", "5B", 18, 6, 1680m, 0, "/uploads/products/wheel-hub.jpg"),
+        new("KBL-3G15", "FLT-YAG-W712", "Yağ Filtresi W712/75", "Kartuş yağ filtresi, stoktan teslim.", "Mann", "W712/75", "W712", "CART", 25, 8, 145m, 1, "/uploads/products/oil-filter.jpg"),
+        new("PRZ-16A", "FLT-HVA-LX", "Hava Filtresi", "Panel hava filtresi, 1.6 TSI.", "Mahle", "LX1780", "AIR", "TSI", 40, 10, 210m, 1, "/uploads/products/oil-filter.jpg"),
+        new("SGT-10A", "FLT-YAK-KL", "Yakıt Filtresi", "Dizel hat filtre, 2.0 TDI.", "Bosch", "F026402048", "FUEL", "TDI", 2, 5, 320m, 1, "/uploads/products/oil-filter.jpg"),
+        new("ELD-5L", "ATS-BJU-FR7", "Buji FR7DCX", "Standart buji, 4'lü kutu.", "NGK", "FR7DCX", "SPARK", "4LU", 18, 6, 96m, 2, "/uploads/products/spark-plug.jpg"),
+        new("ELD-MOP", "ATS-BOB-IG", "Ateşleme Bobini", "Kalem tip ateşleme bobini.", "Valeo", "245103", "COIL", null, 0, 4, 780m, 2, "/uploads/products/spark-plug.jpg"),
+        new("A4-80G", "AYD-FAR-H7", "H7 Far Ampulü", "12V 55W, uzun ömür.", "Osram", "64210", "H7", "12V", 60, 12, 68m, 3, "/uploads/products/h7-bulb.jpg"),
+        new("KAL-MAVI", "AYD-SIN-LED", "LED Sinyal Lambası", "Canbus uyumlu sarı LED.", "Philips", "WY21W", "LED", "CAN", 9, 10, 185m, 3, "/uploads/products/h7-bulb.jpg"),
+        new("CVT-M10-30", "FRN-BAL-ARK", "Arka Fren Balatası", "Arka disk balata seti.", "Brembo", "P85075", "REAR", "OEM", 55, 15, 640m, 0, "/uploads/products/brake-pads.jpg"),
+        new("KBL-3G25", "FLT-POL-CUK", "Polen Filtresi", "Aktif karbon kabin filtresi.", "Mann", "CUK26007", "CABIN", "CARB", 14, 5, 175m, 1, "/uploads/products/oil-filter.jpg")
     ];
 
     private static Product CreateProduct(CatalogRow row, int categoryId, bool resetStock)

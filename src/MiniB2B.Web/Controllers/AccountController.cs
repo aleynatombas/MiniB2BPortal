@@ -2,6 +2,7 @@ using System.Security.Claims;
 using MiniB2B.Business.Dtos;
 using MiniB2B.Business.Exceptions;
 using MiniB2B.Business.Services;
+using MiniB2B.Web.Infrastructure;
 using MiniB2B.Web.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -21,12 +22,16 @@ public class AccountController : Controller
 
     [HttpGet]
     [AllowAnonymous]
-    public IActionResult Login(string? returnUrl = null)
+    public IActionResult Login(string? returnUrl = null, string? portal = null)
     {
         if (User.Identity?.IsAuthenticated == true)
-            return RedirectToAction("Index", "Home");
+            return RedirectForRole(User.IsAdmin() ? "Admin" : "Customer", returnUrl);
 
-        return View(new LoginViewModel { ReturnUrl = returnUrl });
+        return View(new LoginViewModel
+        {
+            ReturnUrl = returnUrl,
+            Portal = ResolvePortal(portal, returnUrl)
+        });
     }
 
     [HttpPost]
@@ -34,6 +39,8 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model, CancellationToken cancellationToken)
     {
+        model.Portal = ResolvePortal(model.Portal, model.ReturnUrl);
+
         if (!ModelState.IsValid)
             return View(model);
 
@@ -45,8 +52,21 @@ public class AccountController : Controller
                 Password = model.Password
             }, cancellationToken);
 
+            var isAdmin = string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase);
+            if (IsAdminPortal(model.Portal) && !isAdmin)
+            {
+                ModelState.AddModelError(string.Empty, "Bu giriş yönetim paneli içindir. Kullanıcı hesabıyla kullanıcı girişini kullanın.");
+                return View(model);
+            }
+
+            if (IsCustomerPortal(model.Portal) && isAdmin)
+            {
+                ModelState.AddModelError(string.Empty, "Bu giriş kullanıcı vitrini içindir. Yönetici hesabıyla yönetici girişini kullanın.");
+                return View(model);
+            }
+
             await SignInAsync(user);
-            return RedirectToAction("Index", "Home");
+            return RedirectForRole(user.Role, model.ReturnUrl);
         }
         catch (BusinessException ex)
         {
@@ -60,7 +80,7 @@ public class AccountController : Controller
     public IActionResult Register()
     {
         if (User.Identity?.IsAuthenticated == true)
-            return RedirectToAction("Index", "Home");
+            return RedirectForRole(User.IsAdmin() ? "Admin" : "Customer");
 
         return View(new RegisterViewModel());
     }
@@ -86,7 +106,7 @@ public class AccountController : Controller
             }, cancellationToken);
 
             await SignInAsync(user);
-            return RedirectToAction("Index", "Home");
+            return RedirectForRole(user.Role);
         }
         catch (BusinessException ex)
         {
@@ -105,6 +125,48 @@ public class AccountController : Controller
 
     [AllowAnonymous]
     public IActionResult AccessDenied() => View();
+
+    private IActionResult RedirectForRole(string role, string? returnUrl = null)
+    {
+        var isAdmin = string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase);
+        if (isAdmin)
+        {
+            if (!string.IsNullOrWhiteSpace(returnUrl)
+                && Url.IsLocalUrl(returnUrl)
+                && returnUrl.StartsWith("/Admin", StringComparison.OrdinalIgnoreCase))
+                return Redirect(returnUrl);
+
+            return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+        }
+
+        if (!string.IsNullOrWhiteSpace(returnUrl)
+            && Url.IsLocalUrl(returnUrl)
+            && !returnUrl.StartsWith("/Admin", StringComparison.OrdinalIgnoreCase))
+            return Redirect(returnUrl);
+
+        return RedirectToAction("Index", "Home", new { area = "" });
+    }
+
+    private static string? ResolvePortal(string? portal, string? returnUrl)
+    {
+        if (string.Equals(portal, "admin", StringComparison.OrdinalIgnoreCase)
+            || (!string.IsNullOrWhiteSpace(returnUrl)
+                && returnUrl.StartsWith("/Admin", StringComparison.OrdinalIgnoreCase)))
+            return "admin";
+
+        if (string.Equals(portal, "customer", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(portal, "bayi", StringComparison.OrdinalIgnoreCase))
+            return "customer";
+
+        return null;
+    }
+
+    private static bool IsAdminPortal(string? portal)
+        => string.Equals(portal, "admin", StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsCustomerPortal(string? portal)
+        => string.Equals(portal, "customer", StringComparison.OrdinalIgnoreCase)
+           || string.Equals(portal, "bayi", StringComparison.OrdinalIgnoreCase);
 
     private async Task SignInAsync(AuthUserDto user)
     {

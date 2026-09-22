@@ -1,0 +1,13 @@
+@model int
+<a class="cart-link" asp-area="" asp-controller="Cart" asp-action="Index" aria-label="Sepet">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M6 6h15l-1.5 9h-12z" />
+        <path d="M6 6 5 3H2" />
+        <circle cx="9" cy="20" r="1.4" fill="currentColor" />
+        <circle cx="18" cy="20" r="1.4" fill="currentColor" />
+    </svg>
+    @if (Model > 0)
+    {
+        <span class="cart-badge">@Model</span>
+    }
+</a>

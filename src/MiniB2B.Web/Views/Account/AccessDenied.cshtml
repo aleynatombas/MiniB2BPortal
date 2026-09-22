@@ -4,6 +4,13 @@
 
 <div class="auth-card">
     <h1>Bu sayfaya erişemezsiniz</h1>
-    <p class="auth-lead">Yönetim paneli yalnızca yöneticilere açıktır.</p>
-    <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Ana sayfaya dön</a>
+    <p class="auth-lead">Yönetim paneli yalnızca yöneticilere; sepet ve sipariş yalnızca bayilere açıktır.</p>
+    @if (User.IsAdmin())
+    {
+        <a class="btn btn-primary" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Yönetim paneline dön</a>
+    }
+    else
+    {
+        <a class="btn btn-primary" asp-area="" asp-controller="Home" asp-action="Index">Vitrine dön</a>
+    }
 </div>

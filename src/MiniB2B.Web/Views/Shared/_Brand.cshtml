@@ -1,0 +1,14 @@
+@{
+    var inverse = ViewData["Inverse"] as bool? == true;
+    var compact = ViewData["Compact"] as bool? == true;
+}
+<span class="brand-mark @(inverse ? "is-inverse" : null) @(compact ? "is-compact" : null)">
+    <img src="~/uploads/brand/logo.png" asp-append-version="true" alt="OtoTedarik" />
+</span>
+<span class="brand-copy">
+    <strong>OtoTedarik</strong>
+    @if (!compact)
+    {
+        <small>YEDEK PARÇA PORTALI</small>
+    }
+</span>

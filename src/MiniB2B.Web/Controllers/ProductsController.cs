@@ -56,15 +56,10 @@ public class ProductsController : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Customer")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddToCart(int productId, int quantity = 1, string? term = null, string? returnTo = null, CancellationToken cancellationToken = default)
     {
-        if (User.IsAdmin())
-        {
-            TempData["Error"] = "Yöneticiler sipariş vermez. Ürün ve siparişleri yönetim panelinden yönetirsiniz.";
-            return RedirectToAction("Index", "Home");
-        }
-
         try
         {
             await _cart.AddItemAsync(User.GetUserId(), productId, quantity, cancellationToken);

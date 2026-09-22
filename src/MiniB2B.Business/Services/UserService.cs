@@ -4,6 +4,7 @@ using MiniB2B.Business.Security;
 using MiniB2B.Business.Validation;
 using MiniB2B.DataAccess;
 using MiniB2B.Domain.Entities;
+using MiniB2B.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace MiniB2B.Business.Services;
@@ -69,6 +70,15 @@ public class UserService : IUserService
             cancellationToken);
         if (duplicate)
             throw new BusinessException("Bu e-posta veya kullanıcı adı başka bir kullanıcıya ait.");
+
+        if (user.Role == UserRole.Admin && (dto.Role != UserRole.Admin || !dto.IsActive))
+        {
+            var otherAdmins = await _unitOfWork.Users.Query().CountAsync(
+                u => u.Id != dto.Id && u.Role == UserRole.Admin && u.IsActive,
+                cancellationToken);
+            if (otherAdmins == 0)
+                throw new BusinessException("Sistemde en az bir aktif yönetici kalmalıdır.");
+        }
 
         user.FirstName = dto.FirstName.Trim();
         user.LastName = dto.LastName.Trim();

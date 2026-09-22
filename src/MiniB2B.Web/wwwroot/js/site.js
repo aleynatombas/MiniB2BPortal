@@ -39,3 +39,41 @@
     });
   });
 })();
+
+(function () {
+  const viewport = document.querySelector(".brand-marquee-viewport");
+  const track = document.querySelector(".brand-marquee-track");
+  if (!viewport || !track) return;
+
+  let paused = false;
+  let x = 0;
+  const speed = 1.25;
+
+  viewport.addEventListener("mouseenter", function () { paused = true; });
+  viewport.addEventListener("mouseleave", function () { paused = false; });
+
+  function groupWidth() {
+    const group = track.querySelector(".brand-marquee-group");
+    return group ? group.offsetWidth : 0;
+  }
+
+  function apply() {
+    track.style.transform = "translateX(" + x + "px)";
+  }
+
+  function tick() {
+    if (!paused) {
+      const w = groupWidth();
+      if (w > 0) {
+        x -= speed;
+        if (x <= -w) x += w;
+        apply();
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  x = 0;
+  apply();
+  requestAnimationFrame(tick);
+})();
