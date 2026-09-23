@@ -56,6 +56,47 @@ Tarayıcı → MiniB2B.Web → MiniB2B.Business → MiniB2B.DataAccess → SQL S
 
 Çözüm dosyası (`.sln`) yoktur. Uygulama Web projesinden çalıştırılır.
 
+Ödev minimum tabloların üzerine ek tablo, alan ve yardımcı yapı eklemeye izin verir. Aşağıdakiler bu tercihlerdir.
+
+### Minimum tablolar
+
+| Tablo | Karşılık |
+| --- | --- |
+| Kullanıcılar | `Users` |
+| Ürünler | `Products` |
+| Kategoriler | `Categories` |
+| Sepet | `Carts` |
+| Sepet ürünleri | `CartItems` |
+| Siparişler | `Orders` |
+| Sipariş kalemleri | `OrderItems` (sipariş anındaki kod, ad, adet, birim fiyat, satır tutarı) |
+
+### Ek tablolar
+
+| Tablo | Neden |
+| --- | --- |
+| `ProductGridColumns` | Ürün listesi kolonları veritabanından yönetilir (alan, sıra, render tipi, genişlik, hizalama, masaüstü / tablet / telefon). |
+| `Sliders` | Ana sayfa kampanya / öne çıkan / duyuru slaytları yönetim panelinden yönetilir. |
+
+### Ek alanlar
+
+| Yer | Alan | Neden |
+| --- | --- | --- |
+| `Products` | `CriticalStockLevel` | Stok rozeti ürün bazında Var / Kritik / Yok |
+| `Products` | `CategoryId`, `IsActive` | Katalog gruplama ve pasifleştirme |
+| `Users` | `Role`, `IsActive`, `PasswordHash` | Yönetici / kullanıcı ayrımı, pasif hesap, BCrypt |
+| `Orders` | `Status` (`Pending` / `Approved` / `Rejected`) | Beklemede + onay / red |
+
+### Ek ekran / uç nokta
+
+| Yer | Ne işe yarar |
+| --- | --- |
+| `/Admin/Dashboard` | Ürün, kullanıcı, sipariş özeti |
+| `/Admin/Sliders` | Slider ekle / düzenle |
+| `/Admin/GridColumns` | Grid kolonlarını kod değiştirmeden ayarla |
+| `/Admin/Products/SetActive` | Ürünü pasifleştir / yeniden yayınla |
+| `/Products/Details?partial=true` | Ürün detayı popup |
+| `/Account/Login?portal=customer` veya `admin` | Kullanıcı ve yönetici girişi ayrı |
+
 ---
 
 ## Kurulum ve çalıştırma
